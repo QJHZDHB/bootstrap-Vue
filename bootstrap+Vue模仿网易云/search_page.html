@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+	
+    <title>搜索结果</title>
+
+    <!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="lib/css/style.css"/>
+	<link href="lib/css/bootstrap.min.css" rel="stylesheet">
+	<link href="lib/css/main.css" rel="stylesheet"/>
+	
+	<!-- 百度统计 -->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?b6479fb9dc6d16ea4922459eec5e203d";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+	<style>
+		body {
+		    background-color: #e0e4e9;
+		}
+		.mod_tab {
+		    position: relative;
+		    zoom: 1;
+		    border-bottom: 1px solid #f7f7f7
+		    margin-bottom: 30px;
+		}
+		.mod_tab, .mod_tab__item {
+		    height: 56px;
+		    line-height: 56px;
+		}
+		.mod_tab__current {
+		    color: #508d92;
+		}
+		.mod_tab__item {
+		    position: relative;
+		    float: left;
+		    font-size: 18px;
+		    overflow: hidden;
+		    margin-right: 55px;
+		}
+		a {
+		    color: #000;
+		    text-decoration: none;
+		} 
+	</style>
+  </head>
+  <body>
+
+    <div class="container">
+		<div class="row">
+			<div class="mod_tab">
+				  <a id="tab_song" class="mod_tab__item mod_tab__current" href = "javascript:void(0);" onclick ="show_song()">单曲</a>
+				  <a id="tab_album" class="mod_tab__item" href = "javascript:void(0);" onclick ="show_album()">专辑</a>
+				  <a id="tab_songlist" class="mod_tab__item" href = "javascript:void(0);" onclick ="show_songlist()">歌单</a>
+				  <a id="tab_singer" class="mod_tab__item" href = "javascript:void(0);" onclick ="show_singer()">歌手</a>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12" id="show">
+				<!-- 单曲展示 -->
+				<div id="show_song" style="display:block;">
+					<div class="row">
+						<span>共搜索到{{ songCount }}首单曲</span>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table table-hover"> 
+								<thead> 
+									<tr> 
+										<td>歌曲</td>
+										<td>歌手</td>
+										<td>专辑</td>
+										<td>时长</td>
+										<td>下载</td>
+									</tr> 
+								</thead > 
+								<tbody v-for="song in songs"> 
+									<tr> 
+										<td>
+											<a :href="toSongPage(song.id)" target="_blank">
+												<span >{{ song.name }}</span>
+												<span v-if="song.alias.length>0" > ({{ song.alias[0] }})</span>
+											</a>
+										</td> 
+										<td> 
+											<!-- 遍历出歌手 -->
+											<span v-for="(singer,index) in song.artists" >
+												<a :href="toSingerPage(singer.id)" target="_blank">
+													{{ singer.name }}
+												</a>
+												<!-- 判断是否加入分隔符 -->
+												<span v-if="index < song.artists.length-1">/</span>
+											</span>
+											
+										</td>
+										 <td><a :href="toAlbumPage(song.album.id)" target="_blank">{{ song.album.name }}</a></td>
+										 <td><span >{{ formatDuraton(song.duration) }}</span>  </td>
+										<!-- 学习模块 -->
+										<td>
+											<a href="javascript:;" :data-id="song.id" :data-name="song.name + ' - ' + song.artists[0].name" onclick="downlode(this)" download>
+												<svg t="1575511417195" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1474" width="32" height="32"><path d="M551.783587 591.158874 551.783587 249.237481 472.216413 249.237481 472.216413 591.160921 336.806397 455.740672 280.542976 512.00921 511.995395 743.448326 743.454978 512.00921 687.192579 455.740672Z" p-id="1475"></path><path d="M982.400045 313.280076c-25.713638-60.794621-62.521962-115.3921-109.403712-162.27385-46.880727-46.879704-101.477182-83.691097-162.272827-109.403712-62.950727-26.626427-129.811508-40.126906-198.727087-40.126906-68.915579 0-135.778406 13.500479-198.72811 40.126906-60.794621 25.712615-115.390054 62.524009-162.269757 109.403712-46.879704 46.88175-83.687004 101.479229-109.400642 162.27385-26.624381 62.951751-40.123836 129.813554-40.123836 198.727087 0 68.915579 13.499455 135.77636 40.123836 198.72504 25.713638 60.794621 62.520939 115.390054 109.400642 162.269757 46.879704 46.87868 101.475136 83.687004 162.269757 109.399619 62.949704 26.624381 129.811508 40.122813 198.72811 40.122813s135.777383-13.498432 198.727087-40.122813c60.795645-25.712615 115.3921-62.521962 162.272827-109.399619 46.880727-46.879704 83.689051-101.475136 109.403712-162.269757 26.625404-62.949704 40.124859-129.810484 40.124859-198.72504C1022.525927 443.093631 1009.025449 376.230804 982.400045 313.280076zM679.751097 909.096017c-53.122895 22.468734-109.563348 33.861202-167.754678 33.861202-58.182121 0-114.617457-11.392468-167.738305-33.861202-51.316759-21.703301-97.407494-52.780087-136.993071-92.363617-39.585577-39.58353-70.663386-85.672218-92.368734-136.986931-22.470781-53.119825-33.864272-109.556185-33.864272-167.738305 0-58.18826 11.394515-114.63076 33.864272-167.754678 21.705348-51.316759 52.783157-97.40954 92.368734-136.995117 39.584554-39.58353 85.675288-70.660316 136.992047-92.365664 53.120848-22.468734 109.556185-33.861202 167.738305-33.861202 58.19133 0 114.631784 11.392468 167.754678 33.861202 51.316759 21.705348 97.40647 52.782134 136.988977 92.365664s70.656223 85.676311 92.360548 136.995117c22.466688 53.121871 33.858132 109.563348 33.858132 167.754678 0 58.184167-11.391445 114.620527-33.858132 167.738305-21.704324 51.316759-52.77804 97.40647-92.359524 136.986931C777.157567 856.314906 731.067856 887.392716 679.751097 909.096017z" p-id="1476"></path></svg>
+											</a>
+										</td>
+									</tr>
+								</tbody> 
+							 </table> 
+						</div>
+					</div>
+				</div>
+				<!-- 专辑展示 -->
+				<div id="show_album" style="display:none;">
+					<div class="row">
+						<span>共搜索到{{ albumCount }}张专辑</span>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table table-hover"> 
+								<thead> 
+									<tr> 
+										<td>专辑</td>
+										<td>歌手</td>
+										<td>发行时间</td> 
+									</tr> 
+								</thead > 
+								<tbody v-for="album in albums"> 
+									<tr>
+										<td>
+											<a :href="toAlbumPage(album.id)" target="_blank">
+												<img width="100" height="100" :src="album.blurPicUrl.replace('http','https') + '?param=200y200'" />
+												<span class="search_name" >{{ album.name }}</span>
+											</a>
+										</td>
+										<td>
+											<a :href="toSingerPage(album.artist.id)" target="_blank">
+												<span >{{ album.artist.name }}</span>
+											</a>
+										</td>
+										<td><span >{{ timestampToTime(album.publishTime) }}</span>  </td>
+									</tr>
+								</tbody> 
+							 </table> 
+						</div>
+					</div>
+				</div>
+				<!-- 歌单展示 -->
+				<div id="show_songlist" style="display:none;">
+					<div class="row">
+						<span>共搜索到{{ playlistCount }}条歌单</span>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table table-hover"> 
+								<thead> 
+									<tr> 
+										<td>歌单</td>
+										<td>创建者</td>
+										<td>单曲数</td>
+										<td>收听</td> 
+									</tr> 
+								</thead > 
+								<tbody v-for="playlist in playlists"> 
+									<tr> 
+										<td>
+											<a :href="toPlaylistPage(playlist.id)" target="_blank">
+												<img width="100" height="100" :src="playlist.coverImgUrl + '?param=200y200'" />
+												<span class="search_name">{{ playlist.name }}</span>
+											</a>
+										</td> 
+										<td> 
+											<a :href="toUserPage(playlist.creator.userId)" target="_blank">
+												<span>{{ playlist.creator.nickname }}</span>
+											</a>
+										</td>
+										<td><span >{{ playlist.trackCount }}</span></td>
+										<td><span >{{ formatPlayCount(playlist.playCount) }}</span></td>
+									</tr>
+								</tbody> 
+							 </table> 
+						</div>
+					</div>
+				</div>
+				<!-- 展示歌手 -->
+				<div id="show_singer" style="display:none;">
+					<div class="row">
+						<span>共搜索到{{ singerCount }}位歌手</span>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table table-hover"> 
+								<thead> 
+									<tr> 
+										<td></td>
+									</tr> 
+								</thead > 
+								<tbody v-for="singer in singers"> 
+									<tr> 
+										<td>
+											<a :href="toSingerPage(singer.id)" target="_blank">
+												<img width="100" height="100" :src="singer.picUrl + '?param=200y200'" />
+												<span class="search_name">{{ singer.name }}</span>
+											</a>
+										</td> 
+									</tr>
+								</tbody> 
+							 </table> 
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<footer class="footer">
+	    <div class="container">	
+			<div style="text-decoration:none; text-align:center; padding:20px 0;">
+				<div style="width:600px;margin:0 auto; padding:20px 0;">
+					<p style="margin:10px 0px;">
+					<b>Copyright © 2020
+					<a href="#" target="_blank" title="SuperManQuan"> SuperManQuan</a> 版权所有 Powered By 
+					<a href="http://wpa.qq.com/msgrd?uin=2785793948" target="_blank" title="SuperManQuan">SuperManQuan</a> Design.&nbsp;&nbsp;
+					</b>
+					<!-- 备案信息代码 -->
+					</p>
+					<a target="_blank" href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=41152502000110" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
+						
+						<p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px; color:#0c0a0a;">
+						本站无音乐版权，请勿用于商业进行非法盈利,多充值主流音乐网站VIP,请支持正版音乐！
+						</p>
+					</a>
+				</div>
+			</div>
+		</div>
+	</footer>
+
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="lib/js/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="lib/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="lib/js/jquery.base64.js"></script>
+	<script src="lib/js/download.js"></script>
+  </body>
+  <script>
+		function oneValues(){
+			var result;
+			var url=window.location.search; //获取url中"?"符后的字串  
+			if(url.indexOf("?")!=-1)
+				result = url.substr(url.indexOf("=")+1);
+			return result;
+		}
+		
+	  // 根据id修改当前选中的选项卡
+		function tab_switch(id){
+			var tab_items=["tab_song","tab_album","tab_songlist","tab_singer"];
+			for(var i=0,len=tab_items.length; i<len ;i++){
+				if(tab_items[i] == id)
+					$("#"+tab_items[i]).attr("class","mod_tab__item mod_tab__current");
+				else
+					$("#"+tab_items[i]).attr("class","mod_tab__item");					
+			} 
+		}
+		// 根据id修改当前展示的内容
+		function show_switch(id){
+			var shows=["show_song","show_album","show_songlist","show_singer"];
+			for(var i=0,len=shows.length; i<len ;i++){
+				if(shows[i] == id)
+					$("#"+shows[i]).attr("style","display:block;");
+				else
+					$("#"+shows[i]).attr("style","display:none;");					
+			}
+		}
+		// 展示单曲事件
+		function show_song(){
+			tab_switch("tab_song");
+			show_switch("show_song");
+		}
+		// 展示专辑事件
+		function show_album(){
+			tab_switch("tab_album");
+			if(searchVue.albumCount == ''){
+				// type=10搜索专辑
+				$.getJSON(
+				    "https://api.music.520303.xyz/search?type=10&keywords=" + oneValues(),
+				    function(data) {
+						if(data.code == 200){
+							searchVue.albums = data.result.albums;
+							searchVue.albumCount = data.result.albumCount;
+							console.log(searchVue.albums);
+						}
+				    }
+				);
+			};
+			show_switch("show_album");
+		}
+		// 展示歌单事件
+		function show_songlist(){
+			tab_switch("tab_songlist");
+			if(searchVue.playlistCount == ''){
+				// type=1000搜索歌单
+				$.getJSON(
+				    "https://api.music.520303.xyz/search?type=1000&keywords=" + oneValues(),
+				    function(data) {
+						if(data.code == 200){
+							searchVue.playlists = data.result.playlists;
+							searchVue.playlistCount = data.result.playlistCount;
+							console.log(searchVue.playlists);
+						}
+				    }
+				);
+			};
+			show_switch("show_songlist");
+		}
+		// 展示歌手事件
+		function show_singer(){
+			tab_switch("tab_singer");
+			if(searchVue.singerCount == ''){
+				// type=100搜索歌手
+				$.getJSON(
+				    "https://api.music.520303.xyz/search?type=100&keywords=" + oneValues(),
+				    function(data) {
+						if(data.code == 200){
+							searchVue.singers = data.result.artists;
+							searchVue.singerCount = data.result.artistCount;
+						}
+				    }
+				);
+			};
+			show_switch("show_singer");
+		}
+		
+		var searchVue = new Vue({
+			el: '#show',
+			data: {
+				keywords: oneValues(),
+				songs: [],
+				albums: [],
+				playlists: [],
+				singers :[],
+				songCount: '',
+				albumCount: '',
+				playlistCount: '',
+				singerCount: '',
+			},
+			methods: {
+				// 传送至相应的歌曲详情页面
+				toSongPage: function (id) {
+					return 'player.html?' + $.base64.encode('id=' + id);
+				},
+				//传送至相应的专辑详情页面
+				toAlbumPage: function (id) {
+					return 'album.html?' + $.base64.encode('id=' + id);
+				},
+				// 传送至相应的歌单详情页面
+				toPlaylistPage: function (id) {
+					return 'playlist.html?' + $.base64.encode('id=' + id);
+				},
+				// 传送至相应的歌手详情页面
+				toSingerPage: function (id) {
+					return 'singer.html?' + $.base64.encode('id=' + id);
+				},
+				// 传送至用户详情页面
+				toUserPage: function (id) {
+					return 'user.html?' + $.base64.encode('id=' + id);
+				},
+				// 格式化音乐时长
+				formatDuraton: function (time){
+					if(time > -1){
+						var temp;
+						var sec = Math.floor(time/1000);
+						//var min = Math.floor(time/60) % 60;
+						var min = Math.floor(sec/60);
+						sec = sec - min*60;
+						if(min < 10){
+							temp = "0" + min + ":";
+						}else
+							temp = min + ":";
+						if(sec < 10){
+							temp += "0" + sec ;
+						}else
+							temp += sec ;
+					}
+					return temp;
+				},
+				//时间戳转换为日期
+				timestampToTime: function(timestamp) {
+					var date = new Date(timestamp);//时间戳为10位需*1000，时间戳为13位的话不需乘1000
+					var Y = date.getFullYear() ;
+					var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) ;
+					var D = date.getDate() ;
+					var h = date.getHours() ;
+					if(h < 10)
+						h = '0' + h;
+					var m = date.getMinutes() ;
+					if(m < 10)
+						m = '0' + m;
+					var s = date.getSeconds();
+					return Y + '年' + M + '月' + D + '日';
+				},
+				// 格式化播放量
+				formatPlayCount: function (count){
+					if(count >= 100000)
+						return (count/10000).toFixed(2) + "万";
+					else
+						return count;
+				},
+			}
+		});
+		// 搜索单曲
+		$.getJSON(
+		    "https://api.music.520303.xyz/search?keywords=" + oneValues(),
+		    function(data) {
+				if(data.code == 200){
+					searchVue.songs = data.result.songs;
+					searchVue.songCount = data.result.songCount;
+					console.log(searchVue.songs);
+				}
+		    }
+		);
+		
+		function downlode(obj){
+			var success = '<svg t="1575529909134" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http:\/\/www.w3.org\/2000\/svg" p-id="1438" width="32" height="32"><path d="M512 85.333333c235.648 0 426.666667 191.018667 426.666667 426.666667s-191.018667 426.666667-426.666667 426.666667S85.333333 747.648 85.333333 512 276.352 85.333333 512 85.333333z m-74.965333 550.4L346.453333 545.152a42.666667 42.666667 0 1 0-60.330666 60.330667l120.704 120.704a42.666667 42.666667 0 0 0 60.330666 0l301.653334-301.696a42.666667 42.666667 0 1 0-60.288-60.330667l-271.530667 271.488z" fill="#52C41A" p-id="1439"><\/path><\/svg>';
+			// 获取音乐URL
+			$.getJSON(
+					  "https://api.music.520303.xyz/song/url?id=" + obj.dataset.id,
+					  function(data) {
+						  if(data.code == 200){
+							if(data.data[0].url != null){
+								//下载模块
+								var x=new XMLHttpRequest();
+								x.open("GET", data.data[0].url.replace("http","https"), true);
+								x.responseType = 'blob';
+								x.onload=function(e){download(x.response, obj.dataset.name + ".mp3" , "audio/mp3" ); }
+								x.send();
+								obj.innerHTML = success;
+							}else
+								alert("当前歌曲无版权");
+						  }
+					  }
+			);
+		}
+		
+  </script>
+</html>

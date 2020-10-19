@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+	
+    <title>歌手榜单</title>
+
+    <!-- Bootstrap -->
+<link rel="stylesheet" type="text/css" href="lib/css/style.css"/>
+    <link href="lib/css/bootstrap.min.css" rel="stylesheet">
+	<link href="lib/css/main.css" rel="stylesheet"/>
+	<style>
+		body {
+		    background-color:#e0e4e9;
+		}
+		a:focus {
+			color: #FFFFFF;
+		}
+	</style>
+	
+
+	<!-- 百度统计 -->
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "https://hm.baidu.com/hm.js?b6479fb9dc6d16ea4922459eec5e203d";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+  </head>
+  <body>
+	
+	<div class="container main">
+		<div class="mod_singer_push">
+			<div class="section_inner">
+				<h2 class="singer_push__tit">
+					<b>最强歌手，云集于此</b>
+				</h2>
+			</div>
+		</div>
+	</div>
+		<div class="container main">
+			<div class="page-header">
+				<h2 class="center"><b>歌 手 榜 单</b> </h2>
+			</div>
+		</div>
+		
+			
+		<div class="main">
+			<div id="mod-singerlist">
+				<div class="mod_singer_list" id="singers">
+					<ul class="singer_list__list js_avtar_list" >
+						<li class="singer_list__item" v-for="singer in singers">
+							<div class="singer_list__item_box">
+								<a :href="toSingerPage(singer.id)" class="singer_list__cover js_singer" hidefocus="true">
+									<img class="singer_list__pic" :src="singer.img1v1Url + '?param=200y200'">
+								</a>
+								<h3 class="singer_list__title"><a :href="toSingerPage(singer.id)"class="js_singer">{{ singer.name }}</a></h3>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		
+		<footer class="footer">
+			<div class="container">	
+				<div style="text-decoration:none; text-align:center; padding:20px 0;">
+					<div style="width:600px;margin:0 auto; padding:20px 0;">
+						<p style="margin:10px 0px;">
+						<b>Copyright © 2020
+						<a href="#" target="_blank" title="SuperManQuan"> SuperManQuan</a> 版权所有 Powered By 
+						<a href="http://wpa.qq.com/msgrd?uin=2785793948" target="_blank" title="SuperManQuan">SuperManQuan</a> Design.&nbsp;&nbsp;
+						</b>
+						<!-- 备案信息代码 -->
+						</p>
+						<a target="_blank" href="#" style="display:inline-block;text-decoration:none;height:20px;line-height:20px;">
+							
+							<p style="float:left;height:20px;line-height:20px;margin: 0px 0px 0px 5px; color:#070606;">
+							本站无音乐版权，请勿用于商业进行非法盈利,多充值主流音乐网站VIP,请支持正版音乐！
+							</p>
+						</a>
+					</div>
+				</div>
+			</div>
+		</footer>
+		
+		
+		
+    <!-- jQuery (Bootstrap 的所有 JavaScript 插件都依赖 jQuery，所以必须放在前边) -->
+    <script src="lib/js/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="lib/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="lib/js/jquery.base64.js"></script>
+  </body>
+	<script>
+		$.getJSON(
+		    "https://api.music.520303.xyz/toplist/artist",
+		    function(data) {
+				if(data.code == 200){
+					singer_rankingVue.singers = data.list.artists;
+				}
+		    }
+		);
+		
+		var singer_rankingVue = new Vue({
+			el: '#singers',
+			data: {
+				singers: [],
+			},
+			methods: {
+				// 传送至相应的歌手详情页面
+				toSingerPage: function (id) {
+					return 'singer.html?' + $.base64.encode('id=' + id);
+				},
+				//根据行列得到元素在数组里的下表
+				
+			},
+		});
+	</script>
+</html>
